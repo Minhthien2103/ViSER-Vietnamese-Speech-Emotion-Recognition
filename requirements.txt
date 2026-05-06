@@ -1,0 +1,10 @@
+yt-dlp
+pandas
+torch
+torchaudio
+pydub
+faster-whisper
+google-generativeai
+label-studio
+groq
+torchcodec
