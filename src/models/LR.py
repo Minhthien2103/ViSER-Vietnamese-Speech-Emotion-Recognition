@@ -1,0 +1,2 @@
+class LRModel:
+    1
