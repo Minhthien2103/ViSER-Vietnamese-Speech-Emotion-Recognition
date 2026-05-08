@@ -34,7 +34,8 @@ def train_knn(X_train, y_train, X_val, y_val, X_test, y_test, source = "librosa"
     knn = KNNModel()
     knn.find_best_k(X_train, y_train, X_val, y_val)
 
-    evaluate(knn, X_test, y_test, f"KNN (k={knn.n_neighbors})", source)
+    y_pred = knn.predict(X_test)
+    evaluate(y_test, y_pred, f"KNN (k={knn.n_neighbors})", source)
     save_model(knn, "knn", source)
 
     return knn
@@ -46,7 +47,8 @@ def train_svm(X_train, y_train, X_val, y_val, X_test, y_test, source = "librosa"
     svm = SVMModel()
     svm.find_best_params(X_train, y_train, X_val, y_val)
 
-    evaluate(svm, X_test, y_test, f"SVM (C={svm.C}, gamma={svm.gamma})", source)
+    y_pred = svm.predict(X_test)
+    evaluate(y_test, y_pred, f"SVM (C={svm.C}, gamma={svm.gamma})", source)
     save_model(svm, "svm", source)
 
     return svm
@@ -58,7 +60,8 @@ def train_rf(X_train, y_train, X_val, y_val, X_test, y_test, source = "librosa")
     rf = RFModel()
     rf.find_best_params(X_train, y_train, X_val, y_val)
 
-    evaluate(rf, X_test, y_test, f"RF (n={rf.n_estimators}, depth={rf.max_depth})", source)
+    y_pred = rf.predict(X_test)
+    evaluate(y_test, y_pred, f"RF (n={rf.n_estimators}, depth={rf.max_depth})", source)
     save_model(rf, "rf", source)
 
     return rf
