@@ -29,7 +29,8 @@ def extract_librosa_features(csv_in, csv_out_1d, dir_out_2d):
     print(f"Bắt đầu trích xuất Librosa cho {len(df)} files...")
 
     for idx, row in tqdm(df.iterrows(), total = len(df)):
-        file_path = config.BASE_DIR / row['path'] 
+        file_path = config.BASE_DIR / row['path']
+        # audio_id: speaker_id + row index + file_id đảm bảo unique kể cả khi augment
         audio_id = f"{row['speaker_id']}_{idx}_{row['file_id']}"
         
         try:

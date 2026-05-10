@@ -9,14 +9,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # 2. CẤU HÌNH ĐƯỜNG DẪN DATA
 DATA_DIR = BASE_DIR / "data"
-RAW_DIR = DATA_DIR / "raw"
-SEGMENTS_DIR = DATA_DIR / "segments"
+TRAIN_DIR = DATA_DIR / "train"          # data/train/{Female|Male}/{accent}/{emotion}/
+TEST_DIR  = DATA_DIR / "test"           # data/test/{Female|Male}/{accent}/{emotion}/
 PROCESSED_DIR = DATA_DIR / "processed"
 
-# 3. CẤU HÌNH FILE METADATA
-TRAIN_META = DATA_DIR / "train_metadata.csv"
-TEST_META = DATA_DIR / "test_metadata.csv"
-MASTER_META = DATA_DIR / "master_metadata.csv"
+# 3. CẤU HÌNH FILE METADATA (tự sinh từ build_metadata.py)
+TRAIN_META = PROCESSED_DIR / "train_metadata.csv"
+TEST_META  = PROCESSED_DIR / "test_metadata.csv"
 
 # 4. CẤU HÌNH TÊN FILE ĐẦU RA
     # Librosa
@@ -35,6 +34,8 @@ WAV2VEC_TEST_2D = PROCESSED_DIR / "test_wav2vec_2d"
 SAMPLE_RATE = 16000
 MAX_DURATION = 5.0
 
+# Nhãn cảm xúc
+EMOTION_LABELS = {"Happy": 0, "Sad": 1, "Angry": 2, "Neutral": 3}
+
 # Tự động tạo thư mục nếu chưa tồn tại
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
-RAW_DIR.mkdir(parents=True, exist_ok=True)
