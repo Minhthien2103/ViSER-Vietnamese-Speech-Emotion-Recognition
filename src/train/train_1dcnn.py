@@ -15,10 +15,11 @@ from evaluation.plotter import plot_training_history, plot_class_distribution
 
 
 FEATURE_SOURCE = "librosa"  # Thay bằng "wav2vec" nếu muốn dùng Wav2Vec2
-EPOCHS = 50
-BATCH_SIZE = 32
-LR = 1e-3
-EARLY_STOP_PATIENCE = 10
+EPOCHS = 80
+BATCH_SIZE = 64
+LR = 3e-4
+EARLY_STOP_PATIENCE = 15
+LABEL_SMOOTHING = 0.1
 
 MODEL_DIR = config.BASE_DIR / "models" / "saved"
 MODEL_DIR.mkdir(parents = True, exist_ok = True)
@@ -32,10 +33,25 @@ def train_1dcnn(source = "librosa"):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"\nTraining CNN on {device}...")
 
-    model = CNN1DModel(input_channels = num_features, num_meta = num_meta, num_classes = num_classes).to(device)
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.AdamW(model.parameters(), lr = LR, weight_decay = 1e-4)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode = 'max', factor = 0.5, patience = 5)
+    model = CNN1DModel(
+        input_channels = num_features,
+        num_meta = num_meta,
+        num_classes = num_classes,
+        dropout = 0.3,
+    ).to(device)
+
+    # Tổng số tham số
+    total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(f"Total trainable parameters: {total_params:,}")
+
+    # Label smoothing giúp model không quá tự tin, giảm overfit
+    criterion = nn.CrossEntropyLoss(label_smoothing = LABEL_SMOOTHING)
+    optimizer = optim.AdamW(model.parameters(), lr = LR, weight_decay = 1e-3)
+
+    # CosineAnnealing — giảm LR mượt hơn ReduceLROnPlateau
+    scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(
+        optimizer, T_0 = 10, T_mult = 2, eta_min = 1e-6
+    )
 
     history = {'train_loss': [], 'val_loss': [], 'train_acc': [], 'val_acc': []}
     best_val_acc = 0.0
@@ -56,6 +72,10 @@ def train_1dcnn(source = "librosa"):
             outputs = model(features, meta)
             loss = criterion(outputs, labels)
             loss.backward()
+
+            # Gradient clipping chống gradient exploding
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm = 1.0)
+
             optimizer.step()
 
             train_loss += loss.item() * features.size(0)
@@ -66,10 +86,12 @@ def train_1dcnn(source = "librosa"):
         train_loss_avg = train_loss / train_total
         train_acc_avg = train_correct / train_total
 
+        scheduler.step()
+
         # VALIDATION
         model.eval()
         val_loss, val_correct, val_total = 0.0, 0, 0
-        
+
         with torch.no_grad():
             for batch in tqdm(val_loader, desc = f"Epoch {epoch:02d}/{EPOCHS} [Val  ]", leave = False):
                 features = batch[0].to(device)
@@ -92,25 +114,24 @@ def train_1dcnn(source = "librosa"):
         history['train_acc'].append(train_acc_avg)
         history['val_acc'].append(val_acc_avg)
 
-        print(f"Epoch {epoch:02d}: Train Loss: {train_loss_avg:.4f}, Train Acc: {train_acc_avg:.4f} | Val Loss: {val_loss_avg:.4f}, Val Acc: {val_acc_avg:.4f}")
+        current_lr = optimizer.param_groups[0]['lr']
+        print(f"Epoch {epoch:02d}: Train Loss: {train_loss_avg:.4f}, Train Acc: {train_acc_avg:.4f} | Val Loss: {val_loss_avg:.4f}, Val Acc: {val_acc_avg:.4f} | LR: {current_lr:.6f}")
 
-        scheduler.step(val_acc_avg)
-
-        # Lưu best model
+        # Lưu best model & Early Stopping
         if val_acc_avg > best_val_acc:
             best_val_acc = val_acc_avg
             patience_counter = 0
             torch.save(model.state_dict(), best_model_path)
-            print(f" Model improved! Saved to {best_model_path.name}")
+            print(f"  Model improved! Saved to {best_model_path.name}")
         else:
             patience_counter += 1
-            print(f" Early stopping counter: {patience_counter}/{EARLY_STOP_PATIENCE}")
+            print(f"  Early stopping counter: {patience_counter}/{EARLY_STOP_PATIENCE}")
             if patience_counter >= EARLY_STOP_PATIENCE:
-                print(f"\n✋ Early stopping triggered! No improvement for {EARLY_STOP_PATIENCE} epochs.")
+                print(f"\nEarly stopping triggered! No improvement for {EARLY_STOP_PATIENCE} epochs.")
                 break
 
     print(f"\nTraining complete! Best Val Acc: {best_val_acc:.4f}")
-    
+
     # Plot curve
     plot_training_history(history, "CNN1D", source)
 
@@ -118,7 +139,7 @@ def train_1dcnn(source = "librosa"):
     print("\nĐánh giá trên tập TEST...")
     model.load_state_dict(torch.load(best_model_path, map_location = device))
     model.eval()
-    
+
     all_preds = []
     all_labels = []
     with torch.no_grad():

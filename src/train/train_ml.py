@@ -12,7 +12,7 @@ from evaluation.evaluate import evaluate
 from evaluation.plotter import plot_class_distribution
 
 
-FEATURE_SOURCE = "librosa"  # "librosa" hoặc "wav2vec"
+FEATURE_SOURCE = "wav2vec"  # "librosa" hoặc "wav2vec"
 
 MODEL_DIR = config.BASE_DIR / "models" / "saved"
 MODEL_DIR.mkdir(parents = True, exist_ok = True)
@@ -74,6 +74,6 @@ if __name__ == "__main__":
 
 
     # train_lr(X_train, y_train, X_val, y_val, X_test, y_test, source = FEATURE_SOURCE)
-    train_knn(X_train, y_train, X_val, y_val, X_test, y_test, source = FEATURE_SOURCE)
-    # train_svm(X_train, y_train, X_val, y_val, X_test, y_test, source = FEATURE_SOURCE)
+    # train_knn(X_train, y_train, X_val, y_val, X_test, y_test, source = FEATURE_SOURCE)
+    train_svm(X_train, y_train, X_val, y_val, X_test, y_test, source = FEATURE_SOURCE)
     # train_rf(X_train, y_train, X_val, y_val, X_test, y_test, source = FEATURE_SOURCE)
