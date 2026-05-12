@@ -14,7 +14,7 @@ from evaluation.evaluate import evaluate
 from evaluation.plotter import plot_training_history, plot_class_distribution
 
 
-FEATURE_SOURCE = "librosa"  # Thay bằng "wav2vec" nếu muốn dùng Wav2Vec2
+FEATURE_SOURCE = "wav2vec"  # Thay bằng "wav2vec" nếu muốn dùng Wav2Vec2
 EPOCHS = 80
 BATCH_SIZE = 64
 LR = 3e-4

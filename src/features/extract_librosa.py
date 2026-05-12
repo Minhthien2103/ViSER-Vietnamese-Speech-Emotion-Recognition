@@ -42,7 +42,7 @@ def extract_librosa_features(csv_in, csv_out_1d, dir_out_2d):
             else:
                 y_2d = np.pad(y, (0, max_length - len(y)), mode = 'constant')
                 
-            # MFCC + Deltas
+            # MFCC + Del ZCRtas
             mfcc_2d = librosa.feature.mfcc(y = y_2d, sr = sr, n_mfcc = 40)              # (40, T) - Âm sắc
             mfcc_delta_2d = librosa.feature.delta(mfcc_2d)                          # (40, T) - Vận tốc thay đổi âm sắc
             mfcc_delta2_2d = librosa.feature.delta(mfcc_2d, order = 2)                # (40, T) - Gia tốc thay đổi âm sắc

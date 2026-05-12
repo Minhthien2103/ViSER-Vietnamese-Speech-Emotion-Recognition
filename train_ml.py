@@ -11,6 +11,7 @@ from models.LiR import LogModel
 from models.LiR import LinModel
 from models.XGB import XGBModel
 from models.LGBM import LGBMModel
+from models.CAT import CatBoostModel
 from utils.data_loader import get_data
 from evaluation.evaluate import evaluate
 from evaluation.plotter import plot_class_distribution
@@ -27,7 +28,6 @@ def save_model(model, name, source):
     joblib.dump(model, path)
     print(f"\nSaved → {path}")
 
-
 def train_lin(X_train, y_train, X_val, y_val, X_test, y_test, source="librosa"):
     linreg = LinModel()
 
@@ -38,7 +38,6 @@ def train_lin(X_train, y_train, X_val, y_val, X_test, y_test, source="librosa"):
     save_model(linreg, "linreg", source)
     return linreg
 
-
 def train_log(X_train, y_train, X_val, y_val, X_test, y_test, source="librosa"):
     logis = LogModel()
     logis.find_best_params(X_train, y_train, X_val, y_val)
@@ -47,8 +46,9 @@ def train_log(X_train, y_train, X_val, y_val, X_test, y_test, source="librosa"):
     evaluate(y_test, y_pred, f"Logistic Regression (C={logis.C}, max_iter={logis.max_iter})", source)
     save_model(logis, "log", source)
 
+    return logis
 
-def train_knn(X_train, y_train, X_val, y_val, X_test, y_test, source = "librosa"):
+def train_knn(X_train, y_train, X_val, y_val, X_test, y_test, source = "wav2vec"):
     print(f"\n Tìm k tốt nhất cho KNN...")
 
     knn = KNNModel()
@@ -86,7 +86,6 @@ def train_rf(X_train, y_train, X_val, y_val, X_test, y_test, source = "librosa")
 
     return rf
 
-
 def train_xgb(X_train, y_train, X_val, y_val, X_test, y_test, source="librosa"):
     xgb = XGBModel()
     xgb.find_best_params(X_train, y_train, X_val, y_val)
@@ -96,7 +95,6 @@ def train_xgb(X_train, y_train, X_val, y_val, X_test, y_test, source="librosa"):
     save_model(xgb, "xgb", source)
 
     return xgb
-
 
 def train_lgbm(X_train, y_train, X_val, y_val, X_test, y_test, source="librosa"):
     lgbm = LGBMModel()
@@ -109,6 +107,18 @@ def train_lgbm(X_train, y_train, X_val, y_val, X_test, y_test, source="librosa")
     return lgbm
 
 
+def train_catboost(X_train, y_train, X_val, y_val, X_test, y_test, source="librosa"):
+    catb = CatBoostModel()
+    catb.find_best_params(X_train, y_train, X_val, y_val)
+
+    # Dự đoán trên tập Test
+    y_pred = catb.predict(X_test)
+    evaluate(y_test, y_pred, f"CatBoost (depth={catb.depth}, lr={catb.learning_rate})", source)
+
+    save_model(catb, "catboost", source)
+
+    return catb
+
 if __name__ == "__main__":
     X_train, y_train, X_val, y_val, X_test, y_test = get_data(source = FEATURE_SOURCE)
 
@@ -117,7 +127,8 @@ if __name__ == "__main__":
     # train_lin(X_train, y_train, X_val, y_val, X_test, y_test, source = FEATURE_SOURCE)
     # train_log(X_train, y_train, X_val, y_val, X_test, y_test, source = FEATURE_SOURCE)
     # train_knn(X_train, y_train, X_val, y_val, X_test, y_test, source = FEATURE_SOURCE)
-    train_svm(X_train, y_train, X_val, y_val, X_test, y_test, source = FEATURE_SOURCE)
+    # train_svm(X_train, y_train, X_val, y_val, X_test, y_test, source = FEATURE_SOURCE)
     # train_rf(X_train, y_train, X_val, y_val, X_test, y_test, source = FEATURE_SOURCE)
     # train_xgb(X_train, y_train, X_val, y_val, X_test, y_test, source = FEATURE_SOURCE)
-    # train_lgbm    (X_train, y_train, X_val, y_val, X_test, y_test, source = FEATURE_SOURCE)
+    # train_lgbm(X_train, y_train, X_val, y_val, X_test, y_test, source = FEATURE_SOURCE)
+    train_catboost(X_train, y_train, X_val, y_val, X_test, y_test, source = FEATURE_SOURCE)
