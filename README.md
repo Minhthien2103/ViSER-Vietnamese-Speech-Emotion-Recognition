@@ -7,10 +7,10 @@ ViSER (Vietnamese Speech Emotion Recognition) là một hệ thống nhận dạ
 ## 💾 Dữ liệu (Our Data)
 Dữ liệu của dự án được thu thập và gán nhãn một cách tỉ mỉ từ nhiều nguồn video và audio tiếng Việt đa dạng. Tập dữ liệu bao gồm các đoạn âm thanh đã được tiền xử lý (cắt gọn, loại bỏ nhiễu) kèm theo bộ Metadata chứa thông tin quan trọng về giới tính (Gender) và vùng miền (Accent), giúp mô hình học được sự đa dạng và phong phú trong giọng nói của người Việt Nam.
 
-🎥 **Video Demo quy trình xử lý và gán nhãn Data**: [Link Video Google Drive](https://drive.google.com/drive/folders/1Dfe_ciWhRGS7le7JQgYVDZxollSi7xG5?usp=sharing)  
+🎥 **Video Demo quy trình xử lý và gán nhãn Data**: [Link Video Demo](https://drive.google.com/drive/folders/1Dfe_ciWhRGS7le7JQgYVDZxollSi7xG5?usp=sharing)  
 *(Video minh họa chi tiết toàn bộ Data Pipeline của nhóm: bắt đầu từ việc tự động crawl video trên mạng, cắt nhỏ đoạn âm thanh (chunking), lọc nhiễu, sử dụng AI để gán nhãn sơ bộ (Pre-labeling), cho đến bước cuối cùng là nghe kiểm tra và tinh chỉnh nhãn thủ công trên giao diện Label Studio).*
 
-🔗 **Link Dataset (Google Drive)**: [Link Google Drive](https://drive.google.com/drive/folders/1vZep6AEUFfs9YdOrtMnDRqO0B4CDXAQE?usp=sharing)
+🔗 **Link Dataset (Google Drive)**: [Link Dataset](https://drive.google.com/drive/folders/1vZep6AEUFfs9YdOrtMnDRqO0B4CDXAQE?usp=sharing)
 
 ## 🛠 Yêu cầu hệ thống (Requirements)
 Để chạy dự án, bạn cần cài đặt môi trường Python và các thư viện cần thiết đã được định nghĩa sẵn trong file `requirements.txt`.
@@ -37,7 +37,12 @@ Bạn cần chạy các script trích xuất để tạo ra file `.csv` (1D) và
 - Để trích xuất bằng Librosa: `python src/features/extract_librosa.py`
 - Để trích xuất bằng Wav2Vec2: `python src/features/extract_wav2vec.py`
 
-**Bước 4: Huấn luyện mô hình (Training)**
+**Bước 4: Sử dụng mô hình đã huấn luyện sẵn (Pre-trained Checkpoints - Tùy chọn)**
+Nếu bạn không muốn mất thời gian train lại từ đầu, nhóm đã cung cấp sẵn các file weights tốt nhất:
+- 🔗 **Link Checkpoints (Google Drive)**: [Link Checkpoints](https://drive.google.com/drive/folders/1-ZNFPH0DaMaxszqx11XNuFwgqRYGiyZ9?usp=sharing)
+- Tải về và giải nén vào thư mục `models/saved/`.
+
+**Bước 5: Huấn luyện mô hình (Training)**
 Sau khi đã có đặc trưng, tiến hành chạy các file training tương ứng:
 - Huấn luyện với Machine Learning: `python src/train/train_ml.py`
 - Huấn luyện với Deep Learning (VD: 1D-CNN): `python src/train/train_1dcnn.py`
