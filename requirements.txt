@@ -1,5 +1,6 @@
 yt-dlp
 pandas
+numpy
 torch
 torchaudio
 pydub
@@ -8,3 +9,11 @@ google-generativeai
 label-studio
 groq
 torchcodec
+librosa
+scikit-learn
+transformers
+matplotlib
+seaborn
+tqdm
+xgboost
+lightgbm

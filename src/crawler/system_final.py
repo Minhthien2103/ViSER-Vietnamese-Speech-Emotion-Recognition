@@ -16,14 +16,14 @@ warnings.filterwarnings("ignore")
 # CẤU HÌNH THÔNG SỐ HỆ THỐNG
 # ==========================================
 # 1. Thư mục và File
-RAW_AUDIO_DIR = "raw_audio"               # Chứa audio gốc tải từ yt-dlp
-CHUNKS_DIR = "processed_chunks"           # Chứa các đoạn ngắn xuất ra
-FINAL_DATASET_DIR = "dataset_final"       # Chứa dataset hoàn chỉnh sau khi sắp xếp
-PRE_LABEL_CSV = "dataset_prelabel.csv"    # File trung gian nạp vào Label Studio
-FINAL_JSON_METADATA = "SENSE_metadata.json" # File JSON đích cuối cùng
+RAW_AUDIO_DIR = "data/raw_audio"               # Chứa audio gốc tải từ yt-dlp
+CHUNKS_DIR = "data/processed_chunks"           # Chứa các đoạn ngắn xuất ra
+FINAL_DATASET_DIR = "data/dataset_final"       # Chứa dataset hoàn chỉnh sau khi sắp xếp
+PRE_LABEL_CSV = "data/dataset_prelabel.csv"    # File trung gian nạp vào Label Studio
+FINAL_JSON_METADATA = "data/SENSE_metadata.json" # File JSON đích cuối cùng
 
 # 2. API & Cảm xúc
-GROQ_API_KEY = "ĐIỀN_API_KEY_CỦA_BẠN_VÀO_ĐÂY"
+GROQ_API_KEY = "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"
 EMOTION_MAP = {
     "Happy": 0,
     "Sad": 1,
@@ -169,7 +169,7 @@ def run_auto_labeling():
 
     groq_client = Groq(api_key=GROQ_API_KEY)
     print("⏳ Đang tải mô hình Whisper...")
-    whisper_model = WhisperModel("large-v3-turbo", device="cpu", compute_type="int8")
+    whisper_model = WhisperModel("large-v3-turbo", device="cuda", compute_type="float16")
     
     results = []
     
