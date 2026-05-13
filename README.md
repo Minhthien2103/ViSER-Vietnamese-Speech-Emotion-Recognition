@@ -32,6 +32,7 @@ cd ViSER-Vietnamese-Speech-Emotion-Recognition
 - Tải dataset từ link Google Drive ở phần trên.
 - Giải nén và đặt toàn bộ dữ liệu vào thư mục `data/`.
 
+
 **Bước 3: Trích xuất đặc trưng (Feature Extraction)**
 Bạn cần chạy các script trích xuất để tạo ra file `.csv` (1D) và `.npy` (2D):
 - Để trích xuất bằng Librosa: `python src/features/extract_librosa.py`
